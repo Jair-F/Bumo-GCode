@@ -5,7 +5,7 @@ import win32security
 FILE_PATH = r"C:\Users\jonik\Desktop\GCode\askdj.txt"
 
 
-def get_file_owner(file_path):
+def get_file_owner(file_path: str) -> bool | None:
     sd = win32security.GetFileSecurity(
         file_path,
         win32security.OWNER_SECURITY_INFORMATION,
