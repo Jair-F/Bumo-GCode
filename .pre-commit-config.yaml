@@ -57,9 +57,9 @@ repos:
                     "--disable=C0114", # missing-module-docstring
                     "--disable=C0116", # missing-function-docstring
                 ]
-    - repo: https://github.com/astral-sh/ruff.git
-      rev: v0.14.11
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.15.0
       hooks:
-        - id: ruff
+        - id: ruff-check
           args: [--fix]
         - id: ruff-format
