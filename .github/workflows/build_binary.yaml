@@ -1,0 +1,25 @@
+name: Build + Publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-push-container:
+    runs-on: tobix/pywine:3.10
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt update && sudo apt upgrade -y
+      - run: pip3 install -r requirements.txt
+      - run: mkdir artifacts
+      - run: pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data\splash.png --add-data "data:data" send_gcode.py
+      - run: echo "copying binary"
+      - run: echo "copying config files to artifacts"
+      - name: create release and upload artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
