@@ -2,7 +2,7 @@ import os
 
 import win32security
 
-FILE_PATH = r"C:\Users\jonik\Desktop\GCode\askdj.txt"
+FILE_PATH = r'C:\Users\jonik\Desktop\GCode\askdj.txt'
 
 
 def get_file_owner(file_path: str) -> bool | None:

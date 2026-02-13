@@ -1,0 +1,52 @@
+[project]
+name = "your-project-name"
+version = "0.1.0"
+description = "Consolidated configuration with single-quote enforcement"
+requires-python = ">=3.9"
+dependencies = [
+    "pyshortcuts",
+    "python-box",
+    "pywin32; sys_platform == 'win32'",
+    "pyyaml",
+    "winotify; sys_platform == 'win32'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "ruff",
+    "mypy",
+    "pylint",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+# Enables rules for pyupgrade (UP), isort (I), and autoflake-like behavior (F)
+select = ["E", "F", "UP", "I", "COM"]
+ignore = ["D100", "D104"]
+
+[tool.ruff.format]
+# Matches double-quote-string-fixer to prevent hook conflicts
+quote-style = "single"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+ignore_missing_imports = true
+install_types = true
+non_interactive = true
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "C0114", # missing-module-docstring
+    "C0116", # missing-function-docstring
+]
+
+[tool.autopep8]
+max_line_length = 120
+aggressive = 3
+in-place = true

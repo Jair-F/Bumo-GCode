@@ -1,11 +1,9 @@
 import os
-import shutil
 
 import win32security
 from winotify import Notification
 
-from tmp.send_gcode import get_data_path
-from tmp.send_gcode import ICON_FILE_NAME
+from tmp.send_gcode import ICON_FILE_NAME, get_data_path
 
 
 def i_am_the_owner(file_path: str) -> bool:
@@ -20,16 +18,12 @@ def i_am_the_owner(file_path: str) -> bool:
         return True
 
 
-def copy_file(latest_file: str, new_path: str):
-    shutil.copy(f"{latest_file}", f"{new_path}")
-
-
 def show_notification(icon: str):
     toast = Notification(
-        app_id="Bumotec 2",
-        title="",
-        msg="GCode was sent successfully",
-        duration="short",
+        app_id='Bumotec 2',
+        title='',
+        msg='GCode was sent successfully',
+        duration='short',
         icon=get_data_path(ICON_FILE_NAME),
     )
     toast.show()
