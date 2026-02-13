@@ -2,6 +2,7 @@ import os
 import shutil
 
 import win32security
+from tmp.send_gcode import ICON_FILE_NAME, get_data_path
 from winotify import Notification
 
 

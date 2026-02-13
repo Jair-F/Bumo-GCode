@@ -1,5 +1,5 @@
 pyshortcuts
 python-box
 pyyaml
-win32security
 winotify
+pywin32

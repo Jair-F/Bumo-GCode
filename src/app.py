@@ -4,16 +4,16 @@ import time
 from contextlib import suppress
 
 import pyshortcuts
-from tools import copy_file
-from tools import i_am_the_owner
-from tools import show_notification
+from src.tools import copy_file
+from src.tools import i_am_the_owner
+from src.tools import show_notification
 
-from src.config import Config
+from src.config import ConfigManager
 
 
 class App:
     def __init__(self):
-        self._config = Config()
+        self._config = ConfigManager()
         self._startup()
         self.already_transfered_files = {}
 
@@ -60,7 +60,7 @@ class App:
     def _startup(self):
         self._create_target_dirs()
         if self._running_as_exe():
-            self._auto_install_startup()
+            # self._auto_install_startup()
             with suppress(ModuleNotFoundError):
                 import pyi_splash
 

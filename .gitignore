@@ -2,3 +2,4 @@ build
 dist
 Python
 deps
+__pycache__
