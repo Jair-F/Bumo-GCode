@@ -1,4 +1,3 @@
 
-config:
-  gcode_dir: C:\Users\jonik\Desktop\GCode
-  target_dir: C:\ankommen
+gcode_dir: C:\Users\jonik\Desktop\GCode
+target_dir: C:\ankommen
