@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pip3 install -r requirements.txt
+pip3 install -e ".[dev]"
 pip3 install pre-commit
 
 git config --global --add safe.directory .
