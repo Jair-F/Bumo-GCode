@@ -12,7 +12,7 @@ class Duplicator:
         self._is_running = True
         self._already_transfered_files = {'': 0.0}
 
-    def init(self):
+    def init(self) -> None:
         self._create_target_dirs()
         self._already_transfered_files = self._get_files_and_mod_times(
             self._vars.gcode_dir,
@@ -22,7 +22,7 @@ class Duplicator:
         try:
             os.mkdir(self._vars.gcode_dir)
         except FileExistsError:
-            ' '
+            pass
 
     def _get_files_and_mod_times(self, directory_path: str) -> dict[str, float]:
         files = {}
@@ -51,10 +51,10 @@ class Duplicator:
             print('new file - copying')
         return should_copy
 
-    def _copy_file(self, latest_file: str, new_path: str):
+    def _copy_file(self, latest_file: str, new_path: str) -> None:
         shutil.copy(f'{latest_file}', f'{new_path}')
 
-    def run(self):
+    def run(self) -> None:
         while self._is_running:
             files = self._get_files_and_mod_times(self._vars.gcode_dir)
             for file_name in files:
@@ -72,5 +72,5 @@ class Duplicator:
 
             time.sleep(self._vars.speed_s)
 
-    def stop(self):
+    def stop(self) -> None:
         self._is_running = False

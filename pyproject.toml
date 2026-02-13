@@ -34,7 +34,7 @@ quote-style = "single"
 indent-style = "space"
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 strict = true
 ignore_missing_imports = true
 install_types = true
@@ -44,6 +44,9 @@ non_interactive = true
 disable = [
     "C0114", # missing-module-docstring
     "C0116", # missing-function-docstring
+    "missing-class-docstring",
+    "unused-variable",
+    "redefined-builtin",
 ]
 
 [tool.autopep8]

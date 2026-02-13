@@ -1,9 +1,7 @@
 import os
 
-import win32security
-from winotify import Notification
-
-from tmp.send_gcode import ICON_FILE_NAME, get_data_path
+import win32security  # pylint: disable=import-error
+from winotify import Notification  # pylint: disable=import-error
 
 
 def i_am_the_owner(file_path: str) -> bool:
@@ -17,13 +15,15 @@ def i_am_the_owner(file_path: str) -> bool:
     if os.getlogin() == name:
         return True
 
+    return False
 
-def show_notification(icon: str):
+
+def show_notification(icon: str) -> None:
     toast = Notification(
         app_id='Bumotec 2',
         title='',
         msg='GCode was sent successfully',
         duration='short',
-        icon=get_data_path(ICON_FILE_NAME),
+        icon=icon,
     )
     toast.show()
