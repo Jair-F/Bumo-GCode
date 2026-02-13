@@ -4,13 +4,15 @@ from contextlib import suppress
 import pyshortcuts  # pylint: disable=import-error
 
 from src.duplicator import Duplicator
+from src.notifier import Notifier
 from src.vars import Vars
 
 
 class App:
     def __init__(self) -> None:
         self._vars = Vars.from_yaml('./config.yaml')
-        self._duplicator = Duplicator(self._vars)
+        self._notifier = Notifier(self._vars)
+        self._duplicator = Duplicator(self._vars, self._notifier)
         self._startup()
 
     def _auto_install_startup(self) -> bool:

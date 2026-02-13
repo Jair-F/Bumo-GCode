@@ -2,15 +2,18 @@ import os
 import shutil
 import time
 
-from src.tools import i_am_the_owner, show_notification
+import win32security  # pylint: disable=import-error
+
+from src.notifier import Notifier
 from src.vars import Vars
 
 
 class Duplicator:
-    def __init__(self, vars: Vars):
+    def __init__(self, vars: Vars, notifier: Notifier):
         self._vars = vars
+        self._notifier = notifier
         self._is_running = True
-        self._already_transfered_files = {'': 0.0}
+        self._already_transfered_files: dict[str, float] = {}
 
     def init(self) -> None:
         self._create_target_dirs()
@@ -51,6 +54,20 @@ class Duplicator:
             print('new file - copying')
         return should_copy
 
+    @classmethod
+    def am_i_the_owner(cls, file_path: str) -> bool:
+        sd = win32security.GetFileSecurity(
+            file_path,
+            win32security.OWNER_SECURITY_INFORMATION,
+        )
+        owner_sid = sd.GetSecurityDescriptorOwner()
+        name, domain, type = win32security.LookupAccountSid(None, owner_sid)
+
+        if os.getlogin() == name:
+            return True
+
+        return False
+
     def _copy_file(self, latest_file: str, new_path: str) -> None:
         shutil.copy(f'{latest_file}', f'{new_path}')
 
@@ -62,10 +79,10 @@ class Duplicator:
                 if self._should_copy_file(
                     file_name,
                     mod_time,
-                ) and i_am_the_owner(file_path):
-                    self._copy_file(file_path, new_path=self._vars.target_dir)
-                    show_notification(
-                        self._vars.get_data_file_path(self._vars.icon_file_name),
+                ) and Duplicator.am_i_the_owner(file_path):
+                    self._copy_file(file_path, self._vars.target_dir)
+                    self._notifier.show_notification(
+                        'GCode was sent successfully',
                     )
                     self._already_transfered_files[file_name] = mod_time
 
