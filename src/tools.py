@@ -2,8 +2,10 @@ import os
 import shutil
 
 import win32security
-from tmp.send_gcode import ICON_FILE_NAME, get_data_path
 from winotify import Notification
+
+from tmp.send_gcode import get_data_path
+from tmp.send_gcode import ICON_FILE_NAME
 
 
 def i_am_the_owner(file_path: str) -> bool:

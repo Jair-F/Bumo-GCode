@@ -4,11 +4,11 @@ import time
 from contextlib import suppress
 
 import pyshortcuts
+
+from src.config import ConfigManager
 from src.tools import copy_file
 from src.tools import i_am_the_owner
 from src.tools import show_notification
-
-from src.config import ConfigManager
 
 
 class App:
