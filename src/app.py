@@ -1,3 +1,4 @@
+import os
 from contextlib import suppress
 
 import pyshortcuts  # pylint: disable=import-error
@@ -8,11 +9,13 @@ from src.vars import Vars
 
 class App:
     def __init__(self) -> None:
-        self._vars = Vars()
+        self._vars = Vars.from_yaml('./config.yaml')
         self._duplicator = Duplicator(self._vars)
         self._startup()
 
     def _auto_install_startup(self) -> bool:
+        os.makedirs(self._vars.auto_start_dir, exist_ok=True)
+
         pyshortcuts.make_shortcut(
             script=self._vars.get_exe_path(),
             name=self._vars.startup_shortcut_name,
@@ -27,7 +30,8 @@ class App:
         if self._vars.running_as_exe():
             self._auto_install_startup()
             with suppress(ModuleNotFoundError):
-                import pyi_splash  # pylint: disable=import-error,import-outside-toplevel
+                # pylint: disable=import-error, import-outside-toplevel
+                import pyi_splash
 
                 pyi_splash.close()
 
