@@ -13,7 +13,6 @@ class App:
         self._startup()
 
     def _auto_install_startup(self) -> bool:
-        return True
         pyshortcuts.make_shortcut(
             script=self._vars.get_exe_path(),
             name=self._vars.startup_shortcut_name,

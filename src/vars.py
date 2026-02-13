@@ -21,10 +21,13 @@ class Vars:
         self.startup_shortcut_name = 'BumoAutostart.lnk'
         self.user_home = os.getenv('userprofile')
         self.auto_start_dir = os.path.join(
-            self.user_home,
+            self.user_home,  # type: ignore[arg-type]
             r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup',
         )
-        self.gcode_dir = os.path.join(self.user_home, r'Desktop\GCode')
+        self.gcode_dir = os.path.join(
+            self.user_home,  # type: ignore[arg-type]
+            r'Desktop\GCode',
+        )
         self.icon_file_name = r'data\splash.png'
         self.target_dir = 'C:\\ankommen'
         self.speed_s = 2
@@ -43,7 +46,7 @@ class Vars:
     def get_data_file_path(self, relative_path: str) -> str:
         bundle_dir = None
         if self.running_as_exe():
-            bundle_dir = sys._MEIPASS  # pylint: disable=protected-access
+            bundle_dir = sys._MEIPASS  # type: ignore[attr-defined] # pylint: disable=protected-access
         else:
             bundle_dir = os.path.dirname(os.path.abspath(__file__))
 

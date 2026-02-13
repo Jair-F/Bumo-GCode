@@ -46,7 +46,7 @@ class Duplicator:
             mod_time = self._already_transfered_files[file_name]
             if last_mode_time > mod_time:
                 should_copy = True
-        except Exception as _:
+        except KeyError as _:
             should_copy = True
             print('new file - copying')
         return should_copy
@@ -57,8 +57,7 @@ class Duplicator:
     def run(self) -> None:
         while self._is_running:
             files = self._get_files_and_mod_times(self._vars.gcode_dir)
-            for file_name in files:
-                mod_time = files[file_name]
+            for file_name, mod_time in files.items():
                 file_path = os.path.join(self._vars.gcode_dir, file_name)
                 if self._should_copy_file(
                     file_name,
