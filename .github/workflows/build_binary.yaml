@@ -12,7 +12,7 @@ jobs:
         image: tobix/pywine:3.10
     steps:
       - uses: actions/checkout@v4
-      - run: wine python3 -m pip install -r requirements.txt
+      - run: wine python -m pip install -r requirements.txt
       - run: mkdir artifacts
       - run: wine pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data\splash.png --add-data "data:data" --paths src src/app.py
       - run: ls -R .
