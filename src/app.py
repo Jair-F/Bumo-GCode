@@ -7,6 +7,7 @@ import pyshortcuts  # pylint: disable=import-error
 
 from src.duplicator import Duplicator
 from src.notifier import Notifier
+from src.uptime_checker import UptimeChecker
 from src.vars import Vars
 
 
@@ -14,12 +15,15 @@ class App:
     def __init__(self) -> None:
         self._vars = Vars.from_yaml('./config.yaml')
         self._notifier = Notifier(self._vars.icon_file_name)
+        self._duplicators = Duplicator(self._vars, self._notifier)
+        self._uptime_checker = UptimeChecker(self._vars, self._notifier)
+
         self._vars.inject_notifier(self._notifier)
 
-        self._duplicator = Duplicator(self._vars, self._notifier)
-
-        self._duplicator_thread = threading.Thread(target=self._duplicator.run)
+        self._duplicator_thread = threading.Thread(target=self._duplicators.run)
+        self._uptime_checker_thread = threading.Thread(target=self._uptime_checker.run)
         self._duplicator_thread.daemon = True
+        self._uptime_checker_thread.daemon = True
 
         self._startup()
 
@@ -45,19 +49,23 @@ class App:
 
                 pyi_splash.close()
 
-        self._duplicator.init()
+        self._duplicators.init()
 
     def run(self) -> None:
         self._duplicator_thread.start()
+        self._uptime_checker_thread.start()
 
         while True:
             if self._vars.auto_reload_config():
-                self._duplicator.init()
+                self._duplicators.init()
             time.sleep(5)
 
     def stop(self) -> None:
-        self._duplicator.stop()
+        self._duplicators.stop()
+        self._uptime_checker.stop()
+        
         self._duplicator_thread.join()
+        self._uptime_checker_thread.join()
 
 
 if __name__ == '__main__':

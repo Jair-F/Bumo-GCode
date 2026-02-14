@@ -17,9 +17,8 @@ class Duplicator:
 
     def init(self) -> None:
         self._create_target_dirs()
-        self._already_transfered_files = self._get_files_and_mod_times(
-            self._vars.gcode_dir,
-        )
+        for gcode_dir in self._vars.gcode_dirs:
+            self._already_transfered_files |= self._get_files_and_mod_times(gcode_dir,)
 
     def _create_dir(self, dir:str) -> None:
         try:
@@ -28,7 +27,8 @@ class Duplicator:
             pass
 
     def _create_target_dirs(self) -> None:
-        self._create_dir(self._vars.gcode_dir)
+        for gcode_dir in self._vars.gcode_dirs:
+            self._create_dir(gcode_dir)
         self._create_dir(self._vars.target_dir)
 
     def _get_files_and_mod_times(self, directory_path: str) -> dict[str, float]:
@@ -68,10 +68,13 @@ class Duplicator:
             win32security.OWNER_SECURITY_INFORMATION,
         )
         owner_sid = sd.GetSecurityDescriptorOwner()
-        name, domain, type = win32security.LookupAccountSid(None, owner_sid)
+        try:
+            name, domain, type = win32security.LookupAccountSid(None, owner_sid)
 
-        if os.getlogin() == name:
-            return True
+            if os.getlogin() == name:
+                return True
+        except Exception as e:
+            print(f"Could not check ownership for {file_path}: {e}")
 
         return False
 
@@ -79,7 +82,12 @@ class Duplicator:
         shutil.copy(f'{latest_file}', f'{new_path}')
     
     def _all_pathes_exist(self) -> bool:
-        return os.path.exists(self._vars.target_dir) and os.path.exists(self._vars.gcode_dir)
+        gcode_dirs_exist = True
+        for gcode_dir in self._vars.gcode_dirs:
+            if not os.path.exists(gcode_dir):
+                gcode_dirs_exist = False
+                break
+        return os.path.exists(self._vars.target_dir) and gcode_dirs_exist
 
     def run(self) -> None:
         while self._is_running:
@@ -87,16 +95,17 @@ class Duplicator:
             if not self._all_pathes_exist():
                 continue
 
-            files = self._get_files_and_mod_times(self._vars.gcode_dir)
-            for file_name, mod_time in files.items():
-                file_path = os.path.join(self._vars.gcode_dir, file_name)
-                if self._should_copy_file(file_path, mod_time):
-                    target_path = os.path.join(self._vars.target_dir, file_name)
+            for gcode_dir in self._vars.gcode_dirs:
+                files = self._get_files_and_mod_times(gcode_dir)
+                for file_name, mod_time in files.items():
+                    file_path = os.path.join(gcode_dir, file_name)
+                    if self._should_copy_file(file_path, mod_time):
+                        target_path = os.path.join(self._vars.target_dir, file_name)
 
-                    self._copy_file(file_path, target_path)
-                    self._notifier.show_notification(
-                        'GCode was sent successfully',
-                    )
+                        self._copy_file(file_path, target_path)
+                        self._notifier.show_notification(
+                            'GCode was sent successfully',
+                        )
                     self._already_transfered_files[file_name] = mod_time
 
     def stop(self) -> None:
