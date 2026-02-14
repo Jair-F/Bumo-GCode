@@ -3,25 +3,10 @@ name = "bumo-gcode"
 version = "0.1.0"
 description = "Consolidated configuration with single-quote enforcement"
 requires-python = ">=3.9"
-dependencies = [
-    "pyshortcuts",
-    "python-box",
-    "pywin32; sys_platform == 'win32'",
-    "pyyaml",
-    "winotify; sys_platform == 'win32'",
-]
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[project.optional-dependencies]
-dev = [
-    "pre-commit",
-    "ruff",
-    "mypy",
-    "pylint",
-]
 
 [tool.setuptools]
 packages = { find = { where = ["src"] } }
