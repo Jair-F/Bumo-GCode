@@ -26,6 +26,7 @@ class Duplicator:
             os.mkdir(dir)
         except FileExistsError:
             pass
+
     def _create_target_dirs(self) -> None:
         self._create_dir(self._vars.gcode_dir)
         self._create_dir(self._vars.target_dir)
@@ -42,7 +43,7 @@ class Duplicator:
                     pass
         return files
 
-    def _should_copy_file(
+    def _new_or_moded_file(
         self,
         file_name: str,
         last_mode_time: float,
@@ -56,6 +57,9 @@ class Duplicator:
             should_copy = True
             print('new file - copying')
         return should_copy
+    
+    def _should_copy_file(self, file_path: str, last_mode_time: float,)->bool:
+        return self._new_or_moded_file(os.path.basename(file_path),last_mode_time,) and Duplicator.am_i_the_owner(file_path)
 
     @classmethod
     def am_i_the_owner(cls, file_path: str) -> bool:
@@ -73,23 +77,27 @@ class Duplicator:
 
     def _copy_file(self, latest_file: str, new_path: str) -> None:
         shutil.copy(f'{latest_file}', f'{new_path}')
+    
+    def _all_pathes_exist(self) -> bool:
+        return os.path.exists(self._vars.target_dir) and os.path.exists(self._vars.gcode_dir)
 
     def run(self) -> None:
         while self._is_running:
+            time.sleep(self._vars.loop_speed_s)
+            if not self._all_pathes_exist():
+                continue
+
             files = self._get_files_and_mod_times(self._vars.gcode_dir)
             for file_name, mod_time in files.items():
                 file_path = os.path.join(self._vars.gcode_dir, file_name)
-                if self._should_copy_file(
-                    file_name,
-                    mod_time,
-                ) and Duplicator.am_i_the_owner(file_path):
-                    self._copy_file(file_path, os.path.join(self._vars.target_dir, file_name))
+                if self._should_copy_file(file_path, mod_time):
+                    target_path = os.path.join(self._vars.target_dir, file_name)
+
+                    self._copy_file(file_path, target_path)
                     self._notifier.show_notification(
                         'GCode was sent successfully',
                     )
                     self._already_transfered_files[file_name] = mod_time
-
-            time.sleep(self._vars.loop_speed_s)
 
     def stop(self) -> None:
         self._is_running = False
