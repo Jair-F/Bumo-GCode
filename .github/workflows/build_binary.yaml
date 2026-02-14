@@ -24,10 +24,10 @@ jobs:
           name: build
           path: artifacts/
           retention-days: 5
-      # - name: create release and upload artifacts
-      #   uses: softprops/action-gh-release@v2
-      #   with:
-      #     files: |
-      #       artifacts/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      - name: create release and upload artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
