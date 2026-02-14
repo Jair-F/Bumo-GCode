@@ -38,7 +38,7 @@ class App:
 
     def _startup(self) -> None:
         if self._vars.running_as_exe():
-            # self._auto_install_startup()
+            self._auto_install_startup()
             with suppress(ModuleNotFoundError):
                 # pylint: disable=import-error, import-outside-toplevel
                 import pyi_splash
