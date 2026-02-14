@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: wine python -m pip install -r requirements.txt
       - run: mkdir artifacts
-      - run: wine pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data\splash.png --add-data "data:data" --paths src src/app.py
+      - run: wine pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data/splash.png --add-data "data:data" --paths src src/app.py
       - run: ls -R .
       - run: cp dist/app.exe artifacts
       - run: cp config.yaml artifacts
