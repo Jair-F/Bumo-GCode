@@ -1,4 +1,4 @@
 
 startup_shortcut_name: BumoAutostart.lnk
-gcode_dirs: [ "./GCode_dir_bumo1", Z:\tmp ]
+gcode_dirs: [ "./GCode_dir_bumo1", "./GCode_dir_bumo2" ]
 target_dir: ./target_dir

@@ -17,7 +17,7 @@ jobs:
       - run: wine pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data/splash.png --add-data "data:data" --paths src src/app.py
       - run: ls -R .
       - run: cp dist/app.exe artifacts
-      - run: cp config.yaml artifacts
+      - run: cp config.yaml stop.bat artifacts
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
