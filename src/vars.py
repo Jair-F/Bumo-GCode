@@ -65,7 +65,7 @@ class Vars:
 
         return cls()
 
-    def auto_reload_config(self, config_file:str = 'config.yaml'):
+    def auto_reload_config(self, config_file:str = 'config.yaml') -> bool:
         config_last_mod_time = os.path.getmtime(config_file)
         if config_last_mod_time > self._last_config_read_time:
             new_vars = Vars.from_yaml(config_file)
@@ -74,3 +74,5 @@ class Vars:
 
             self._notifier.show_notification("config hot-reloaded")
             print("config hot reloaded")
+            return True
+        return False

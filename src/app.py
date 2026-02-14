@@ -51,7 +51,8 @@ class App:
         self._duplicator_thread.start()
 
         while True:
-            self._vars.auto_reload_config()
+            if self._vars.auto_reload_config():
+                self._duplicator.init()
             time.sleep(5)
 
     def stop(self) -> None:
