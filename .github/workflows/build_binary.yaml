@@ -19,12 +19,12 @@ jobs:
       - run: wine pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data/splash.png --add-data "data:data" --paths src src/app.py
       - run: cp dist/app.exe artifacts
       - run: cp config.yaml stop.bat artifacts
-      - name: Zip Folder
-        uses: thedoctor0/zip-release@0.7.6
-        with:
-          type: 'zip'
-          filename: 'dist.zip'
-          directory: 'artifacts'
+      - name: Install Zip Utility
+        run: |
+          apt-get update
+          apt-get install -y zip
+      - name: Archive artifacts
+        run: cd artifacts && zip -r ../dist.zip .
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
