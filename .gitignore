@@ -2,3 +2,13 @@ build
 dist
 Python
 deps
+__pycache__
+Lib
+Scripts
+Include
+.venv
+pyvenv.cfg
+tmp
+UNKNOWN.egg-info
+GCode_dir*
+target_dir*

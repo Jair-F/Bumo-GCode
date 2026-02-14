@@ -1,5 +1,6 @@
-pyshortcuts 
-winotify
-win32security
-pyyaml
+pre-commit
+pyshortcuts
 python-box
+pywin32
+pyyaml
+winotify
