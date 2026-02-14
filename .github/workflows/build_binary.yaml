@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
         image: tobix/pywine:3.10
+    permissions:
+        contents: write # Needed for creating a release and uploading assets
     steps:
       - uses: actions/checkout@v4
       - run: wine python -m pip install -r requirements.txt
