@@ -20,7 +20,7 @@ class Vars:
             r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup',
         )
         self.gcode_dirs = ['./GCode_dir']
-        self.icon_file_name = r'../data\splash.png'
+        self.icon_file_name = r'data\splash.png'
         self.target_dir = './target_dir'
         self.suc_synonyms = 'successfully'
         self.loop_speed_s = 2
