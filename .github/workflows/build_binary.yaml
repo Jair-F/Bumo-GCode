@@ -12,7 +12,7 @@ jobs:
         image: tobix/pywine:3.10
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt update && sudo apt upgrade -y
+      - run: apt update && apt upgrade -y
       - run: pip3 install -r requirements.txt
       - run: mkdir artifacts
       - run: pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data\splash.png --add-data "data:data" --paths src src/app.py
