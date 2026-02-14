@@ -14,7 +14,7 @@ from src.vars import Vars
 class App:
     def __init__(self) -> None:
         self._vars = Vars.from_yaml('./config.yaml')
-        self._notifier = Notifier(self._vars.icon_file_name)
+        self._notifier = Notifier(self._vars.get_data_file_path(self._vars.icon_file_name))
         self._duplicators = Duplicator(self._vars, self._notifier)
         self._uptime_checker = UptimeChecker(self._vars, self._notifier)
 

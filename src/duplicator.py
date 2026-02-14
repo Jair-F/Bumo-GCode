@@ -1,4 +1,5 @@
 import os
+import random
 import shutil
 import time
 
@@ -106,7 +107,7 @@ class Duplicator:
 
                         self._copy_file(file_path, target_path)
                         self._notifier.show_notification(
-                            'GCode was sent successfully',
+                            F'{file_name} sent {random.choice(self._vars.suc_synonyms)}',
                         )
                     self._already_transfered_files[file_name] = mod_time
 
