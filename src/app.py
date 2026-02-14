@@ -1,5 +1,7 @@
 import os
 from contextlib import suppress
+import threading
+import time
 
 import pyshortcuts  # pylint: disable=import-error
 
@@ -11,8 +13,14 @@ from src.vars import Vars
 class App:
     def __init__(self) -> None:
         self._vars = Vars.from_yaml('./config.yaml')
-        self._notifier = Notifier(self._vars)
+        self._notifier = Notifier(self._vars.icon_file_name)
+        self._vars.inject_notifier(self._notifier)
+
         self._duplicator = Duplicator(self._vars, self._notifier)
+
+        self._duplicator_thread = threading.Thread(target=self._duplicator.run)
+        self._duplicator_thread.daemon = True
+
         self._startup()
 
     def _auto_install_startup(self) -> bool:
@@ -30,7 +38,7 @@ class App:
 
     def _startup(self) -> None:
         if self._vars.running_as_exe():
-            self._auto_install_startup()
+            # self._auto_install_startup()
             with suppress(ModuleNotFoundError):
                 # pylint: disable=import-error, import-outside-toplevel
                 import pyi_splash
@@ -40,10 +48,15 @@ class App:
         self._duplicator.init()
 
     def run(self) -> None:
-        self._duplicator.run()
+        self._duplicator_thread.start()
+
+        while True:
+            self._vars.auto_reload_config()
+            time.sleep(5)
 
     def stop(self) -> None:
         self._duplicator.stop()
+        self._duplicator_thread.join()
 
 
 if __name__ == '__main__':

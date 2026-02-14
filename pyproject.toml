@@ -1,5 +1,5 @@
 [project]
-name = "your-project-name"
+name = "bumo-gcode"
 version = "0.1.0"
 description = "Consolidated configuration with single-quote enforcement"
 requires-python = ">=3.9"
@@ -22,6 +22,9 @@ dev = [
     "mypy",
     "pylint",
 ]
+
+[tool.setuptools]
+packages = { find = { where = ["src"] } }
 
 [tool.ruff]
 line-length = 120

@@ -10,3 +10,5 @@ Include
 pyvenv.cfg
 tmp
 UNKNOWN.egg-info
+GCode_dir
+target_dir

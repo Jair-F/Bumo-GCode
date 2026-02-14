@@ -1,31 +1,34 @@
 import os
 import sys
 from pathlib import Path
+import time
 from typing import Any
 
+from src.notifier import Notifier
 import yaml  # pylint: disable=import-error
 
 
 class Vars:
     def __init__(self, **kwargs: Any) -> None:
-        # self.load_config()
+        self._last_config_read_time = time.time()
+
         self.startup_shortcut_name = 'BumoAutostart.lnk'
         self.user_home = os.getenv('userprofile') or os.path.expanduser('~')
         self.auto_start_dir = os.path.join(
             self.user_home,
             r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup',
         )
-        self.gcode_dir = os.path.join(
-            self.user_home,
-            r'Desktop\GCode',
-        )
+        self.gcode_dir = './GCode_dir'
         self.icon_file_name = r'data\splash.png'
-        self.target_dir = 'C:\\ankommen'
-        self.speed_s = 2
+        self.target_dir = './target_dir'
+        self.loop_speed_s = 2
 
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
+
+    def inject_notifier(self, notifier: Notifier) -> None:
+        self._notifier = notifier
 
     def get_exe_path(self) -> str:
         application_path = 'unknown'
@@ -61,3 +64,13 @@ class Vars:
                 print(f'Error loading config, using defaults: {e}')
 
         return cls()
+
+    def auto_reload_config(self, config_file:str = 'config.yaml'):
+        config_last_mod_time = os.path.getmtime(config_file)
+        if config_last_mod_time > self._last_config_read_time:
+            new_vars = Vars.from_yaml(config_file)
+            self.__dict__.update(new_vars.__dict__)
+            self._last_config_read_time = time.time()
+
+            self._notifier.show_notification("config hot-reloaded")
+            print("config hot reloaded")

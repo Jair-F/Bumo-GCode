@@ -21,11 +21,14 @@ class Duplicator:
             self._vars.gcode_dir,
         )
 
-    def _create_target_dirs(self) -> None:
+    def _create_dir(self, dir:str) -> None:
         try:
-            os.mkdir(self._vars.gcode_dir)
+            os.mkdir(dir)
         except FileExistsError:
             pass
+    def _create_target_dirs(self) -> None:
+        self._create_dir(self._vars.gcode_dir)
+        self._create_dir(self._vars.target_dir)
 
     def _get_files_and_mod_times(self, directory_path: str) -> dict[str, float]:
         files = {}
@@ -80,13 +83,13 @@ class Duplicator:
                     file_name,
                     mod_time,
                 ) and Duplicator.am_i_the_owner(file_path):
-                    self._copy_file(file_path, self._vars.target_dir)
+                    self._copy_file(file_path, os.path.join(self._vars.target_dir, file_name))
                     self._notifier.show_notification(
                         'GCode was sent successfully',
                     )
                     self._already_transfered_files[file_name] = mod_time
 
-            time.sleep(self._vars.speed_s)
+            time.sleep(self._vars.loop_speed_s)
 
     def stop(self) -> None:
         self._is_running = False

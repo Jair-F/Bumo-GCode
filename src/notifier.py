@@ -1,11 +1,12 @@
+import os
+import time
 from winotify import Notification  # pylint: disable=import-error
-
-from src.vars import Vars
 
 
 class Notifier:  # pylint: disable=too-few-public-methods
-    def __init__(self, vars: Vars):
+    def __init__(self, icon_file_path:str):
         self._vars = vars
+        self.icon_file_path = icon_file_path
 
     def show_notification(
         self,
@@ -19,6 +20,6 @@ class Notifier:  # pylint: disable=too-few-public-methods
             title=title,
             msg=msg,
             duration=duration,
-            icon=self._vars.icon_file_name,
+            icon=os.path.abspath(self.icon_file_path),
         )
         toast.show()
