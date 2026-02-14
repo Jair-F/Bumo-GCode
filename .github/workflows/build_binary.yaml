@@ -1,0 +1,39 @@
+name: Build + Publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-push-container:
+    runs-on: ubuntu-latest
+    container:
+        image: tobix/pywine:3.10
+    permissions:
+        contents: write # Needed for creating a release and uploading assets
+    steps:
+      - uses: actions/checkout@v4
+      - run: wine python -m pip install -r requirements.txt
+      - run: mkdir artifacts
+      - run: wine pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data/splash.png --add-data "data:data" --paths src src/app.py
+      - run: cp dist/app.exe artifacts
+      - run: cp config.yaml stop.bat artifacts
+      - name: Install Zip Utility
+        run: |
+          apt-get update
+          apt-get install -y zip
+      - name: Archive artifacts
+        run: cd artifacts && zip -r ../dist.zip .
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: artifacts/
+          retention-days: 5
+      - name: create release and upload artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

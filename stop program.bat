@@ -1,1 +1,0 @@
-taskkill -im send_gcode.exe /f
