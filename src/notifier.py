@@ -1,10 +1,10 @@
 import os
-import time
+
 from winotify import Notification  # pylint: disable=import-error
 
 
 class Notifier:  # pylint: disable=too-few-public-methods
-    def __init__(self, icon_file_path:str):
+    def __init__(self, icon_file_path: str):
         self._vars = vars
         self.icon_file_path = icon_file_path
 

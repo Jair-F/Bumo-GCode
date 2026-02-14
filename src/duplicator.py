@@ -18,9 +18,9 @@ class Duplicator:
     def init(self) -> None:
         self._create_target_dirs()
         for gcode_dir in self._vars.gcode_dirs:
-            self._already_transfered_files |= self._get_files_and_mod_times(gcode_dir,)
+            self._already_transfered_files |= self._get_files_and_mod_times(gcode_dir)
 
-    def _create_dir(self, dir:str) -> None:
+    def _create_dir(self, dir: str) -> None:
         try:
             os.mkdir(dir)
         except FileExistsError:
@@ -57,9 +57,11 @@ class Duplicator:
             should_copy = True
             print('new file - copying')
         return should_copy
-    
-    def _should_copy_file(self, file_path: str, last_mode_time: float,)->bool:
-        return self._new_or_moded_file(os.path.basename(file_path),last_mode_time,) and Duplicator.am_i_the_owner(file_path)
+
+    def _should_copy_file(self, file_path: str, last_mode_time: float) -> bool:
+        return self._new_or_moded_file(os.path.basename(file_path), last_mode_time) and Duplicator.am_i_the_owner(
+            file_path,
+        )
 
     @classmethod
     def am_i_the_owner(cls, file_path: str) -> bool:
@@ -73,14 +75,14 @@ class Duplicator:
 
             if os.getlogin() == name:
                 return True
-        except Exception as e:
-            print(f"Could not check ownership for {file_path}: {e}")
+        except Exception as e:  # pylint: broad-except
+            print(f'Could not check ownership for {file_path}: {e}')
 
         return False
 
     def _copy_file(self, latest_file: str, new_path: str) -> None:
         shutil.copy(f'{latest_file}', f'{new_path}')
-    
+
     def _all_pathes_exist(self) -> bool:
         gcode_dirs_exist = True
         for gcode_dir in self._vars.gcode_dirs:

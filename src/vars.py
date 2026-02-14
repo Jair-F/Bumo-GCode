@@ -1,11 +1,12 @@
 import os
 import sys
-from pathlib import Path
 import time
+from pathlib import Path
 from typing import Any
 
-from src.notifier import Notifier
 import yaml  # pylint: disable=import-error
+
+from src.notifier import Notifier
 
 
 class Vars:
@@ -65,7 +66,7 @@ class Vars:
 
         return cls()
 
-    def auto_reload_config(self, config_file:str = 'config.yaml') -> bool:
+    def auto_reload_config(self, config_file: str = 'config.yaml') -> bool:
         if not os.path.exists(config_file):
             return False
 
@@ -75,8 +76,8 @@ class Vars:
             self.__dict__.update(new_vars.__dict__)
             self._last_config_read_time = time.time()
 
-            self._notifier.show_notification("config hot-reloaded")
-            print("config hot reloaded")
+            self._notifier.show_notification('config hot-reloaded')
+            print('config hot reloaded')
             return True
 
         return False

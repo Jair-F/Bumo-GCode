@@ -33,12 +33,17 @@ install_types = true
 non_interactive = true
 
 [tool.pylint."MESSAGES CONTROL"]
+max-line-length = 120
 disable = [
     "C0114", # missing-module-docstring
     "C0116", # missing-function-docstring
     "missing-class-docstring",
     "unused-variable",
     "redefined-builtin",
+    "broad-exception-caught",
+    "too-many-instance-attributes",
+    "attribute-defined-outside-init",
+    "unrecognized-inline-option"
 ]
 
 [tool.autopep8]

@@ -1,7 +1,7 @@
 import os
-from contextlib import suppress
 import threading
 import time
+from contextlib import suppress
 
 import pyshortcuts  # pylint: disable=import-error
 
@@ -63,7 +63,7 @@ class App:
     def stop(self) -> None:
         self._duplicators.stop()
         self._uptime_checker.stop()
-        
+
         self._duplicator_thread.join()
         self._uptime_checker_thread.join()
 
