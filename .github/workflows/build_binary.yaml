@@ -13,13 +13,19 @@ jobs:
       - run: sudo apt update && sudo apt upgrade -y
       - run: pip3 install -r requirements.txt
       - run: mkdir artifacts
-      - run: pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data\splash.png --add-data "data:data" send_gcode.py
-      - run: echo "copying binary"
-      - run: echo "copying config files to artifacts"
-      - name: create release and upload artifacts
-        uses: softprops/action-gh-release@v2
+      - run: pyinstaller --onefile --noconsole --icon icon/icon.ico --splash data\splash.png --add-data "data:data" --paths src src/app.py
+      - run: ls -R .
+      - run: cp dist/app.exe artifacts
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
         with:
-          files: |
-            artifacts/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          name: build
+          path: artifacts/
+          retention-days: 5
+      # - name: create release and upload artifacts
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     files: |
+      #       artifacts/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.TOKEN }}
