@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Docker: kniwase/wine-python-nuitka:3.10
+
 # --experimental=new-dll-tool \
 # --windows-console-mode=disable \
 # --lto=no
