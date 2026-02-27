@@ -9,7 +9,7 @@ jobs:
   build-push-container:
     runs-on: ubuntu-latest
     container:
-        image: jairf/nuitka_win_builder:0.0.1
+        image: jairf/nuitka_win_builder:latest
     permissions:
         contents: write # Needed for creating a release and uploading assets
     steps:
