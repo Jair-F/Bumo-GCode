@@ -42,6 +42,7 @@ class App:
 
     def _startup(self) -> None:
         if self._vars.running_as_exe():
+            print('auto installing in startup folder')
             self._auto_install_startup()
             with suppress(ModuleNotFoundError):
                 # pylint: disable=import-error, import-outside-toplevel

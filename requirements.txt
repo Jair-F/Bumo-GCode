@@ -1,6 +1,14 @@
+
+# nuitka
+msvc-runtime
+Nuitka[onefile]==2.6
+ordered-set
+patchelf # for linux nutika
+
 pre-commit
 pyshortcuts
 python-box
 pywin32
 pyyaml
 winotify
+zstandard
