@@ -15,6 +15,7 @@ wine python -m nuitka --standalone --onefile --jobs=$(nproc) \
 
 : <<'COMMENT'
 linux:
+python3 -m pip install patchelf
 python3 -m nuitka --standalone --onefile --jobs=$(nproc) \
     --assume-yes-for-downloads \
     --windows-icon-from-ico=icon/icon.ico \
