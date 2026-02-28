@@ -7,6 +7,9 @@ import threading
 import time
 from contextlib import ExitStack
 
+import pystray
+from PIL import Image
+from pystray import MenuItem as item
 import pidfile  # pylint: disable=import-error
 import pyshortcuts  # pylint: disable=import-error
 
@@ -15,13 +18,19 @@ from src.notifier import Notifier
 from src.uptime_checker import UptimeChecker
 from src.vars import Vars
 
+def create_image(width, height, color1, color2):
+    # Generate an image for the icon
+    image = Image.new('RGB', (width, height), color1)
+    # ... drawing logic ...
+    return image
 
 class App:
     def __init__(self, force_run: bool = False) -> None:
         self._stack = ExitStack()
         self._vars = Vars.from_yaml('./config.yaml')
-        self._notifier = Notifier(self._vars.get_data_file_path(self._vars.icon_file_name))
+        self._notifier = Notifier(self._vars.get_data_file_path(self._vars.icon_file_name_png))
 
+        self._show_system_tray_blocking()
         self._exit_if_already_running(force_run)
 
         self._duplicators = Duplicator(self._vars, self._notifier)
@@ -34,10 +43,24 @@ class App:
         self._duplicator_thread.daemon = True
         self._uptime_checker_thread.daemon = True
 
-        print(self._vars.running_as_exe())
-        print(self._vars.get_data_file_path('..\\icon\\icon.ico'))
-
         self._startup()
+
+    def _show_system_tray_blocking(self):
+        menu = pystray.Menu(
+            item('About', lambda: print("App v1.0")),
+            item('Quit', self.stop) 
+        )
+        try:
+            icon = Image.open(self._vars.get_data_file_path(self._vars.icon_file_name_ico))
+        except FileNotFoundError:
+            print("icon for system tray not found - skipping")
+        self._system_tray_icon = pystray.Icon(
+            'Bumo GCode',
+            icon,
+            "Bumo GCode",
+            menu
+        )
+        self._system_tray_icon.run()
 
     def _exit_if_already_running(self, force_run: bool = False) -> None:
         program_data_path = os.path.expandvars('%APPDATA%')
@@ -76,7 +99,7 @@ class App:
             script=self._vars.get_exe_path(),
             name=self._vars.startup_shortcut_name,
             folder=self._vars.auto_start_dir,
-            icon=self._vars.icon_file_name,
+            icon=self._vars.icon_file_name_png,
             description=None,
         )
         print(f"Shortcut '{self._vars.startup_shortcut_name}' created.")
@@ -118,6 +141,7 @@ class App:
         self._duplicator_thread.join()
         self._uptime_checker_thread.join()
 
+        self._system_tray_icon.stop()
         self._stack.close()
 
 

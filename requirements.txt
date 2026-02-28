@@ -13,3 +13,5 @@ pywin32
 pyyaml
 winotify
 zstandard
+pystray
+Image
