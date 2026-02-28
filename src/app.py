@@ -1,6 +1,5 @@
 # nuitka-project: --standalone
 # nuitka-project: --onefile
-# nuitka-project: --jobs={nproc}
 # nuitka-project: --assume-yes-for-downloads
 # nuitka-project: --mingw64
 # nuitka-project: --lto=no
