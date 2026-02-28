@@ -1,11 +1,12 @@
+import argparse
 import os
 import pathlib
 import sys
 import tempfile
 import threading
 import time
+from contextlib import ExitStack
 
-import argparse
 import pidfile  # pylint: disable=import-error
 import pyshortcuts  # pylint: disable=import-error
 
@@ -16,7 +17,8 @@ from src.vars import Vars
 
 
 class App:
-    def __init__(self, force_run = False) -> None:
+    def __init__(self, force_run: bool = False) -> None:
+        self._stack = ExitStack()
         self._vars = Vars.from_yaml('./config.yaml')
         self._notifier = Notifier(self._vars.get_data_file_path(self._vars.icon_file_name))
 
@@ -37,10 +39,10 @@ class App:
 
         self._startup()
 
-    def _exit_if_already_running(self, force_run = False) -> None:
+    def _exit_if_already_running(self, force_run: bool = False) -> None:
         program_data_path = os.path.expandvars('%APPDATA%')
         pid_file_path = os.path.join(program_data_path, 'Bumo_GCode\\app.pidfile')
-        
+
         if force_run:
             try:
                 os.remove(pid_file_path)
@@ -57,8 +59,7 @@ class App:
         )
 
         try:
-            self._pid_file = pidfile.PIDFile(pid_file_path)
-            self._pid_file.__enter__()
+            self._pid_file = self._stack.enter_context(pidfile.PIDFile(pid_file_path))
         except pidfile.AlreadyRunningError:
             self._notifier.show_notification(
                 title='Program already running',
@@ -84,13 +85,13 @@ class App:
         if 'NUITKA_ONEFILE_PARENT' in os.environ:
             splash_filename = os.path.join(
                 tempfile.gettempdir(),
-                'onefile_%d_splash_feedback.tmp' % int(os.environ['NUITKA_ONEFILE_PARENT'])
+                f'onefile_{int(os.environ["NUITKA_ONEFILE_PARENT"])}_splash_feedback.tmp',
             )
             if os.path.exists(splash_filename):
                 try:
                     os.unlink(splash_filename)
                 except OSError:
-                    print("no splash configured or splash already closed.")
+                    print('no splash configured or splash already closed.')
 
     def _startup(self) -> None:
         if self._vars.running_as_exe():
@@ -116,12 +117,12 @@ class App:
         self._duplicator_thread.join()
         self._uptime_checker_thread.join()
 
-        self._pid_file.close()
+        self._stack.close()
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Copier")
-    parser.add_argument("--force", action="store_true", help="Forcefully run even if an instance is already running")
+    parser = argparse.ArgumentParser(description='Copier')
+    parser.add_argument('--force', action='store_true', help='Forcefully run even if an instance is already running')
     args = parser.parse_args()
 
     app = App(args.force)
