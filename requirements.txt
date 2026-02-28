@@ -3,10 +3,12 @@
 msvc-runtime
 Nuitka[onefile]==2.6
 ordered-set
+pathlib
 
 pre-commit
 pyshortcuts
 python-box
+python-pidfile
 pywin32
 pyyaml
 winotify

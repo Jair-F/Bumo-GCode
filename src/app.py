@@ -8,10 +8,12 @@
 # nuitka-project: --output-filename=app.exe
 
 import os
+import pathlib
 import tempfile
 import threading
 import time
 
+import pidfile  # pylint: disable=import-error
 import pyshortcuts  # pylint: disable=import-error
 
 from src.duplicator import Duplicator
@@ -24,6 +26,9 @@ class App:
     def __init__(self) -> None:
         self._vars = Vars.from_yaml('./config.yaml')
         self._notifier = Notifier(self._vars.get_data_file_path(self._vars.icon_file_name))
+
+        self._exit_if_already_running()
+
         self._duplicators = Duplicator(self._vars, self._notifier)
         self._uptime_checker = UptimeChecker(self._vars, self._notifier)
 
@@ -35,6 +40,23 @@ class App:
         self._uptime_checker_thread.daemon = True
 
         self._startup()
+
+    def _exit_if_already_running(self) -> None:
+        program_data_path = os.path.expandvars('%PROGRAMDATA%')
+        pid_file_path = os.path.join(program_data_path, 'Bumo_GCode\\app.pidfile')
+        pathlib.Path(os.path.dirname(pid_file_path)).mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        try:
+            self._pid_file = pidfile.PIDFile(pid_file_path)
+        except pidfile.AlreadyRunningError:
+            self._notifier.show_notification(
+                title='Program already running',
+                msg='exiting - please close first already running one.',
+                app_id='Already Running Error',
+            )
 
     def _auto_install_startup(self) -> bool:
         os.makedirs(self._vars.auto_start_dir, exist_ok=True)
@@ -81,6 +103,8 @@ class App:
 
         self._duplicator_thread.join()
         self._uptime_checker_thread.join()
+
+        self._pid_file.close()
 
 
 if __name__ == '__main__':
