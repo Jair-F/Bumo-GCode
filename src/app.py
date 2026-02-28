@@ -13,24 +13,20 @@ from pystray import MenuItem as item
 import pidfile  # pylint: disable=import-error
 import pyshortcuts  # pylint: disable=import-error
 
+from src.const import VERSION
 from src.duplicator import Duplicator
 from src.notifier import Notifier
 from src.uptime_checker import UptimeChecker
 from src.vars import Vars
 
-def create_image(width, height, color1, color2):
-    # Generate an image for the icon
-    image = Image.new('RGB', (width, height), color1)
-    # ... drawing logic ...
-    return image
 
 class App:
     def __init__(self, force_run: bool = False) -> None:
+        self._is_running = True
         self._stack = ExitStack()
         self._vars = Vars.from_yaml('./config.yaml')
-        self._notifier = Notifier(self._vars.get_data_file_path(self._vars.icon_file_name_png))
+        self._notifier = Notifier(self._vars.icon_file_png_path)
 
-        self._show_system_tray_blocking()
         self._exit_if_already_running(force_run)
 
         self._duplicators = Duplicator(self._vars, self._notifier)
@@ -38,29 +34,25 @@ class App:
 
         self._vars.inject_notifier(self._notifier)
 
-        self._duplicator_thread = threading.Thread(target=self._duplicators.run)
-        self._uptime_checker_thread = threading.Thread(target=self._uptime_checker.run)
-        self._duplicator_thread.daemon = True
-        self._uptime_checker_thread.daemon = True
+        self._duplicator_thread = threading.Thread(target=self._duplicators.run, daemon=True)
+        self._uptime_checker_thread = threading.Thread(target=self._uptime_checker.run, daemon=True)
 
+        self._show_system_tray_non_blocking()
         self._startup()
 
-    def _show_system_tray_blocking(self):
+    def _show_system_tray_non_blocking(self):
         menu = pystray.Menu(
-            item('About', lambda: print("App v1.0")),
+            item('About', lambda: self._notifier.show_notification(F'App v{VERSION}')),
             item('Quit', self.stop) 
         )
-        try:
-            icon = Image.open(self._vars.get_data_file_path(self._vars.icon_file_name_ico))
-        except FileNotFoundError:
-            print("icon for system tray not found - skipping")
+        icon = Image.open(self._vars.icon_file_ico_path)
         self._system_tray_icon = pystray.Icon(
             'Bumo GCode',
             icon,
             "Bumo GCode",
             menu
         )
-        self._system_tray_icon.run()
+        self._system_tray_icon.run_detached()
 
     def _exit_if_already_running(self, force_run: bool = False) -> None:
         program_data_path = os.path.expandvars('%APPDATA%')
@@ -99,7 +91,7 @@ class App:
             script=self._vars.get_exe_path(),
             name=self._vars.startup_shortcut_name,
             folder=self._vars.auto_start_dir,
-            icon=self._vars.icon_file_name_png,
+            icon=self._vars.icon_file_png_path,
             description=None,
         )
         print(f"Shortcut '{self._vars.startup_shortcut_name}' created.")
@@ -129,19 +121,22 @@ class App:
         self._duplicator_thread.start()
         self._uptime_checker_thread.start()
 
-        while True:
+        while self._is_running:
             if self._vars.auto_reload_config():
                 self._duplicators.init()
             time.sleep(5)
 
     def stop(self) -> None:
+        print("shutting down app")
+
+        self._is_running = False
         self._duplicators.stop()
         self._uptime_checker.stop()
+        self._system_tray_icon.stop()
 
         self._duplicator_thread.join()
         self._uptime_checker_thread.join()
 
-        self._system_tray_icon.stop()
         self._stack.close()
 
 

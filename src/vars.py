@@ -20,8 +20,8 @@ class Vars:
             r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup',
         )
         self.gcode_dirs = ['./GCode_dir']
-        self.icon_file_name_png = r'..\data\splash.png'
-        self.icon_file_name_ico = '..\icon\icon.ico'
+        self.icon_file_png_path = self.get_data_file_path(r'..\data\splash.png')
+        self.icon_file_ico_path = self.get_data_file_path('..\data\icon.ico')
         self.target_dir = './target_dir'
         self.suc_synonyms = 'successfully'
         self.loop_speed_s = 2
@@ -45,7 +45,7 @@ class Vars:
         return '__compiled__' in globals()
 
     def get_data_file_path(self, relative_path: str) -> str:
-        base_path = os.path.abspath('.')
+        base_path = os.path.abspath('src')
         if self.running_as_exe():
             base_path = os.path.dirname(__file__)
 
