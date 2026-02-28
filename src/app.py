@@ -42,6 +42,7 @@ class App:
     def _exit_if_already_running(self, force_run: bool = False) -> None:
         program_data_path = os.path.expandvars('%APPDATA%')
         pid_file_path = os.path.join(program_data_path, 'Bumo_GCode\\app.pidfile')
+        print(F'app pidfile at: {pid_file_path}')
 
         if force_run:
             try:
