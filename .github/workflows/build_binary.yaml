@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: wine python -m pip install -r requirements.txt
       - run: mkdir artifacts
-      - run: wine python -m nuitka --user-package-configuration-file=nuitka-package.config.yml src/main.py
+      - run: wine python -m nuitka --user-package-configuration-file=nuitka-package.config.yml src/app.py
       - run: cp app.exe artifacts
       - run: cp config.yaml stop.bat artifacts
       - name: Install Zip Utility

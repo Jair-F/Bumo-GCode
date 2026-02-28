@@ -50,11 +50,11 @@ class App:
         print(f"Shortcut '{self._vars.startup_shortcut_name}' created.")
         return True
 
-    def _close_splash(self):
+    def _close_splash(self) -> None:
         if 'NUITKA_ONEFILE_PARENT' in os.environ:
             splash_filename = os.path.join(
                 tempfile.gettempdir(),
-                'onefile_%d_splash_feedback.tmp' % int(os.environ['NUITKA_ONEFILE_PARENT']),
+                'onefile_%d_splash_feedback.tmp',
             )
             if os.path.exists(splash_filename):
                 os.unlink(splash_filename)
