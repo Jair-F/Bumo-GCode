@@ -1,7 +1,17 @@
+# nuitka-project: --standalone
+# nuitka-project: --onefile
+# nuitka-project: --jobs={nproc}
+# nuitka-project: --assume-yes-for-downloads
+# nuitka-project: --mingw64
+# nuitka-project: --lto=no
+# nuitka-project: --remove-output
+# nuitka-project: --onefile-windows-splash-screen-image=data/splash.png
+# nuitka-project: --output-filename=app.exe
+
 import os
+import tempfile
 import threading
 import time
-from contextlib import suppress
 
 import pyshortcuts  # pylint: disable=import-error
 
@@ -40,15 +50,20 @@ class App:
         print(f"Shortcut '{self._vars.startup_shortcut_name}' created.")
         return True
 
+    def _close_splash(self):
+        if 'NUITKA_ONEFILE_PARENT' in os.environ:
+            splash_filename = os.path.join(
+                tempfile.gettempdir(),
+                'onefile_%d_splash_feedback.tmp' % int(os.environ['NUITKA_ONEFILE_PARENT']),
+            )
+            if os.path.exists(splash_filename):
+                os.unlink(splash_filename)
+
     def _startup(self) -> None:
         if self._vars.running_as_exe():
             print('auto installing in startup folder')
             self._auto_install_startup()
-            with suppress(ModuleNotFoundError):
-                # pylint: disable=import-error, import-outside-toplevel
-                import pyi_splash
-
-                pyi_splash.close()
+            self._close_splash()
 
         self._duplicators.init()
 

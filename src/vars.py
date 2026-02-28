@@ -35,20 +35,18 @@ class Vars:
     def get_exe_path(self) -> str:
         application_path = 'unknown'
         if self.running_as_exe():
-            application_path = os.path.dirname(sys.executable)
+            application_path = os.path.abspath(sys.argv[0])
         elif __file__:
             application_path = os.path.dirname(__file__)
         return application_path
 
     def running_as_exe(self) -> bool:
-        return getattr(sys, 'frozen', False)
+        return '__compiled__' in globals()
 
     def get_data_file_path(self, relative_path: str) -> str:
-        base_path = None
+        base_path = os.path.abspath('.')
         if self.running_as_exe():
-            base_path = sys._MEIPASS  # type: ignore[attr-defined] # pylint: disable=protected-access
-        else:
-            base_path = os.path.dirname(os.path.abspath(__file__))
+            base_path = os.path.dirname(__file__)
 
         return os.path.join(base_path, relative_path)
 

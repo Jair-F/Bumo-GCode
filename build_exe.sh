@@ -8,6 +8,8 @@ wine python -m nuitka --standalone --onefile --jobs=$(nproc) \
     --onefile-windows-splash-screen-image=data/splash.png \
     src/app.py -o app.exe
 
+# python -m nuitka --standalone --user-package-configuration-file=my-package.nuitka-package.config.yml main.py
+
 # --onefile-no-compression
 # --onefile-windows-splash-screen-image=data/splash.png
 
