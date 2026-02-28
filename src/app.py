@@ -1,18 +1,11 @@
-# nuitka-project: --standalone
-# nuitka-project: --onefile
-# nuitka-project: --assume-yes-for-downloads
-# nuitka-project: --mingw64
-# nuitka-project: --lto=no
-# nuitka-project: --remove-output
-# nuitka-project: --onefile-windows-splash-screen-image=data/splash.png
-# nuitka-project: --output-filename=app.exe
-
 import os
 import pathlib
+import sys
 import tempfile
 import threading
 import time
 
+import argparse
 import pidfile  # pylint: disable=import-error
 import pyshortcuts  # pylint: disable=import-error
 
@@ -23,11 +16,11 @@ from src.vars import Vars
 
 
 class App:
-    def __init__(self) -> None:
+    def __init__(self, force_run = False) -> None:
         self._vars = Vars.from_yaml('./config.yaml')
         self._notifier = Notifier(self._vars.get_data_file_path(self._vars.icon_file_name))
 
-        self._exit_if_already_running()
+        self._exit_if_already_running(force_run)
 
         self._duplicators = Duplicator(self._vars, self._notifier)
         self._uptime_checker = UptimeChecker(self._vars, self._notifier)
@@ -39,11 +32,25 @@ class App:
         self._duplicator_thread.daemon = True
         self._uptime_checker_thread.daemon = True
 
+        print(self._vars.running_as_exe())
+        print(self._vars.get_data_file_path('..\\icon\\icon.ico'))
+
         self._startup()
 
-    def _exit_if_already_running(self) -> None:
-        program_data_path = os.path.expandvars('%PROGRAMDATA%')
+    def _exit_if_already_running(self, force_run = False) -> None:
+        program_data_path = os.path.expandvars('%APPDATA%')
         pid_file_path = os.path.join(program_data_path, 'Bumo_GCode\\app.pidfile')
+        
+        if force_run:
+            try:
+                os.remove(pid_file_path)
+                self._notifier.show_notification(
+                    title='Program already running',
+                    msg='force removed pidfile of already running instance',
+                )
+            except FileNotFoundError:
+                pass
+
         pathlib.Path(os.path.dirname(pid_file_path)).mkdir(
             parents=True,
             exist_ok=True,
@@ -51,12 +58,14 @@ class App:
 
         try:
             self._pid_file = pidfile.PIDFile(pid_file_path)
+            self._pid_file.__enter__()
         except pidfile.AlreadyRunningError:
             self._notifier.show_notification(
                 title='Program already running',
-                msg='exiting - please close first already running one.',
-                app_id='Already Running Error',
+                msg='exiting - please close first the already running one.',
             )
+            time.sleep(2)
+            sys.exit(-1)
 
     def _auto_install_startup(self) -> bool:
         os.makedirs(self._vars.auto_start_dir, exist_ok=True)
@@ -75,10 +84,13 @@ class App:
         if 'NUITKA_ONEFILE_PARENT' in os.environ:
             splash_filename = os.path.join(
                 tempfile.gettempdir(),
-                'onefile_%d_splash_feedback.tmp',
+                'onefile_%d_splash_feedback.tmp' % int(os.environ['NUITKA_ONEFILE_PARENT'])
             )
             if os.path.exists(splash_filename):
-                os.unlink(splash_filename)
+                try:
+                    os.unlink(splash_filename)
+                except OSError:
+                    print("no splash configured or splash already closed.")
 
     def _startup(self) -> None:
         if self._vars.running_as_exe():
@@ -108,7 +120,11 @@ class App:
 
 
 if __name__ == '__main__':
-    app = App()
+    parser = argparse.ArgumentParser(description="Copier")
+    parser.add_argument("--force", action="store_true", help="Forcefully run even if an instance is already running")
+    args = parser.parse_args()
+
+    app = App(args.force)
     try:
         app.run()
     except KeyboardInterrupt as _:
