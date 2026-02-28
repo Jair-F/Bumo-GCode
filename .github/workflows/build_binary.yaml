@@ -18,7 +18,11 @@ jobs:
       - run: mkdir artifacts
       - name: Insert version tag
         run: sed -i 's/x.x.x/v${{ github.ref_name }}/g' nuitka-package.config.yml
-      - run: wine python -m nuitka --jobs=$(nproc) --user-package-configuration-file=nuitka-package.config.yml src/app.py
+      - run: wine python -m nuitka --jobs=$(nproc) --standalone --onefile --mingw64 \
+            --lto=no --remove-output --assume-yes-for-downloads \
+            --onefile-windows-splash-screen-image=data/splash.png \
+            --user-package-configuration-file=nuitka-package.config.yml \
+            --output-filename=app.exe src/app.py
       - run: cp app.exe artifacts
       - run: cp config.yaml stop.bat artifacts
       - name: Install Zip Utility
