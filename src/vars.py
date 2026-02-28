@@ -13,14 +13,16 @@ class Vars:
     def __init__(self, **kwargs: Any) -> None:
         self._last_config_read_time = time.time()
 
+        self.app_pid_file_path = os.path.join(os.path.expandvars('%APPDATA%'), 'Bumo_GCode\\app.pidfile')
         self.startup_shortcut_name = 'BumoAutostart.lnk'
         self.user_home = os.getenv('userprofile') or os.path.expanduser('~')
         self.auto_start_dir = os.path.join(
             self.user_home,
             r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup',
         )
+        self.icon_file_png_path = self.get_data_file_path(r'..\data\splash.png')
+        self.icon_file_ico_path = self.get_data_file_path('..\\data\\icon.ico')
         self.gcode_dirs = ['./GCode_dir']
-        self.icon_file_name = r'data\splash.png'
         self.target_dir = './target_dir'
         self.suc_synonyms = 'successfully'
         self.loop_speed_s = 2
@@ -35,20 +37,18 @@ class Vars:
     def get_exe_path(self) -> str:
         application_path = 'unknown'
         if self.running_as_exe():
-            application_path = os.path.dirname(sys.executable)
+            application_path = os.path.abspath(sys.argv[0])
         elif __file__:
             application_path = os.path.dirname(__file__)
         return application_path
 
     def running_as_exe(self) -> bool:
-        return getattr(sys, 'frozen', False)
+        return '__compiled__' in globals()
 
     def get_data_file_path(self, relative_path: str) -> str:
-        base_path = None
+        base_path = os.path.abspath('src')
         if self.running_as_exe():
-            base_path = sys._MEIPASS  # type: ignore[attr-defined] # pylint: disable=protected-access
-        else:
-            base_path = os.path.dirname(os.path.abspath(__file__))
+            base_path = os.path.dirname(__file__)
 
         return os.path.join(base_path, relative_path)
 
