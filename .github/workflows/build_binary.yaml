@@ -18,8 +18,8 @@ jobs:
       - run: mkdir artifacts
       - name: Insert version tag
         run: |
-            sed -i 's/x.x.x/v${{ github.ref_name }}/g' src/const.py
-            sed -i 's/x.x.x/v${{ github.ref_name }}/g' build_exe.sh
+            sed -i 's/x.x.x/${{ github.ref_name }}/g' src/const.py
+            sed -i 's/x.x.x/${{ github.ref_name }}/g' build_exe.sh
       - run: chmod +x *.sh && ./build_exe.sh
       - run: cp app.exe artifacts
       - run: cp config.yaml artifacts
