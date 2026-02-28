@@ -22,7 +22,7 @@ jobs:
             sed -i 's/x.x.x/v${{ github.ref_name }}/g' build_exe.sh
       - run: ./build_exe.sh
       - run: cp app.exe artifacts
-      - run: cp config.yaml stop.bat artifacts
+      - run: cp config.yaml artifacts
       - name: Install Zip Utility
         run: |
           apt-get update

@@ -7,11 +7,11 @@ import threading
 import time
 from contextlib import ExitStack
 
-import pystray
-from PIL import Image
-from pystray import MenuItem as item
 import pidfile  # pylint: disable=import-error
 import pyshortcuts  # pylint: disable=import-error
+import pystray  # pylint: disable=import-error
+from PIL import Image  # pylint: disable=import-error
+from pystray import MenuItem as item  # pylint: disable=import-error
 
 from src.const import VERSION
 from src.duplicator import Duplicator
@@ -40,28 +40,26 @@ class App:
         self._show_system_tray_non_blocking()
         self._startup()
 
-    def _show_system_tray_non_blocking(self):
+    def _show_system_tray_non_blocking(self) -> None:
         menu = pystray.Menu(
-            item('About', lambda: self._notifier.show_notification(F'App v{VERSION}')),
-            item('Quit', self.stop) 
+            item('About', lambda: self._notifier.show_notification(f'v{VERSION}')),
+            item('Quit', self.stop),
         )
         icon = Image.open(self._vars.icon_file_ico_path)
         self._system_tray_icon = pystray.Icon(
             'Bumo GCode',
             icon,
-            "Bumo GCode",
-            menu
+            'Bumo GCode',
+            menu,
         )
         self._system_tray_icon.run_detached()
 
     def _exit_if_already_running(self, force_run: bool = False) -> None:
-        program_data_path = os.path.expandvars('%APPDATA%')
-        pid_file_path = os.path.join(program_data_path, 'Bumo_GCode\\app.pidfile')
-        print(F'app pidfile at: {pid_file_path}')
+        print(f'app pidfile at: {self._vars.app_pid_file_path}')
 
         if force_run:
             try:
-                os.remove(pid_file_path)
+                os.remove(self._vars.app_pid_file_path)
                 self._notifier.show_notification(
                     title='Program already running',
                     msg='force removed pidfile of already running instance',
@@ -69,13 +67,13 @@ class App:
             except FileNotFoundError:
                 pass
 
-        pathlib.Path(os.path.dirname(pid_file_path)).mkdir(
+        pathlib.Path(os.path.dirname(self._vars.app_pid_file_path)).mkdir(
             parents=True,
             exist_ok=True,
         )
 
         try:
-            self._pid_file = self._stack.enter_context(pidfile.PIDFile(pid_file_path))
+            self._pid_file = self._stack.enter_context(pidfile.PIDFile(self._vars.app_pid_file_path))
         except pidfile.AlreadyRunningError:
             self._notifier.show_notification(
                 title='Program already running',
@@ -127,7 +125,7 @@ class App:
             time.sleep(5)
 
     def stop(self) -> None:
-        print("shutting down app")
+        print('shutting down app')
 
         self._is_running = False
         self._duplicators.stop()
